@@ -1,0 +1,6 @@
+﻿CREATE TABLE [SystemConfig].[LogsServer]
+(
+    [LogId] INT NOT NULL PRIMARY KEY IDENTITY,
+    [LogValues] NVARCHAR(MAX) NOT NULL,
+    CreatedDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
