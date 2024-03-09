@@ -1,15 +1,15 @@
 ﻿CREATE PROCEDURE [Runtime].[CreateAccount]
 (
-    @BusinessUUID UNIQUEIDENTIFIER,
+    @BusinessId UNIQUEIDENTIFIER,
     @BusinessName NVARCHAR(50),
     @EmailBusiness NVARCHAR(50),
     @PhoneBusiness NVARCHAR(9),
     @Address NVARCHAR(50),
     @ImgUrl NVARCHAR(MAX),
     @RUC NVARCHAR(19),
-    @DepartmentId INT,
-    @BusinessTypeId INT,
-    @OwnerUUID UNIQUEIDENTIFIER,
+    @DepartmentId UNIQUEIDENTIFIER,
+    @BusinessTypeId UNIQUEIDENTIFIER,
+    @OwnerId UNIQUEIDENTIFIER,
     @FullName NVARCHAR(50),
     @EmailOwner NVARCHAR(50),
     @PhoneOwner NVARCHAR(9),
@@ -22,7 +22,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @OwnerId INT;
+    DECLARE @OwnerIdentifier INT;
+    DECLARE @BusinessIdentifier INT;
 
     INSERT INTO [UserManagement].[OwnersBusiness]
     (
@@ -36,7 +37,7 @@ BEGIN
     )
     VALUES
     (
-        @OwnerUUID,
+        @OwnerId,
         @FullName,
         @EmailOwner,
         @PhoneOwner,
@@ -45,7 +46,7 @@ BEGIN
         @PasswordSalt
     );
 
-	SET @OwnerId = SCOPE_IDENTITY();
+	SET @OwnerIdentifier = SCOPE_IDENTITY();
 
     
     INSERT INTO [BusinessData].[Business]
@@ -64,9 +65,9 @@ BEGIN
     )
     VALUES
     (
-        @BusinessUUID,
-        @OwnerId,
-		@OwnerUUID,
+        @BusinessId,
+        @OwnerIdentifier,
+		@OwnerId,
         @BusinessName,
         @EmailBusiness,
         @PhoneBusiness,
@@ -76,6 +77,10 @@ BEGIN
         @DepartmentId,
         @BusinessTypeId
     );
+
+    SET @BusinessIdentifier = SCOPE_IDENTITY();
+
+    INSERT INTO [BusinessData].[BusinessConfigurations] (BusinessId) VALUES (@BusinessIdentifier);
 
 	SET @RowCount = @@ROWCOUNT;
 END;
@@ -105,3 +110,37 @@ BEGIN
 	SET @RowCount = @@ROWCOUNT;
 
 END;
+
+GO
+
+CREATE PROCEDURE [Runtime].[GetUserInfo]
+(
+    @Email  NVARCHAR(50)
+)
+AS
+BEGIN
+    SELECT 
+        CASE 
+            WHEN OB.Email = @Email THEN OB.OwnerId
+            ELSE U.UserId 
+        END AS UserId,
+        CASE 
+            WHEN OB.Email = @Email THEN OB.PasswordHashed 
+            ELSE U.PasswordHashed 
+        END AS PasswordHashed,
+        CASE 
+            WHEN OB.Email = @Email THEN OB.PasswordSalt 
+            ELSE U.PasswordSalt 
+        END AS PasswordSalt
+    FROM 
+        [UserManagement].[OwnersBusiness] OB
+    INNER JOIN 
+        [BusinessData].[Business] B ON OB.OwnerId = B.OwnerId
+    LEFT JOIN 
+        [UserManagement].[Users] U ON B.BusinessId = U.BusinessId
+    WHERE 
+        (OB.[Email] = @Email OR U.[Email] = @Email)
+        AND OB.[EmailConfirmed] = 1 
+        AND OB.[IsActive] = 1 
+        AND U.[IsActive] = 1;
+END

@@ -1,6 +1,6 @@
 ﻿namespace Ioon.Domain.Primitives
 {
-    public abstract class AgregateRoot
+    public abstract class AggregateRoot
     {
         private readonly List<DomainEvent> _domainEvents = new();
 

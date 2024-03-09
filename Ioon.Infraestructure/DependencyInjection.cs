@@ -1,8 +1,5 @@
-﻿using Ioon.Application.Common.Interfaces.Data;
-using Ioon.Domain.Common.Interfaces.Base;
+﻿using Ioon.Domain.Common.Interfaces.Base;
 using Ioon.Domain.Common.Interfaces.Repositories;
-using Ioon.Infrastructure.Context;
-using Ioon.Infrastructure.Data;
 using Ioon.Infrastructure.Persistence;
 using Ioon.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -22,20 +19,31 @@ namespace Ioon.Infrastructure
 
         private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SqlProvider")));
+            services.AddOptions<DatabaseOptions>()
+                .Configure((options) =>
+                {
+                    var dbSection = Configuration.GetSection("DBType");
 
-            services.AddScoped<IApplicationDbContext>(provider => 
-            provider.GetRequiredService<ApplicationDbContext>());
+                    if (dbSection.Exists())
+                    {
+                        dbSection.Bind(options);
+                    }
 
-            services.AddScoped<IUnitOfWork>(provider => 
-            provider.GetRequiredService<ApplicationDbContext>());
+                    options.ConnectionString = Configuration.GetConnectionString("SqlProvider")
+                        ?? throw new InvalidOperationException("La cadena de conexión SqlProvider está ausente en appsettings.json.");
+                });
+
+            services.AddScoped<IDatabaseContext, DatabaseContext>();
 
             return services;
+
+        
         }
 
         private static IServiceCollection AddDependecies(this IServiceCollection services)
         {
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped(typeof(IUserRepository<,>), typeof(AccountRepository));
+            services.AddScoped(typeof(IProductRepository<,>), typeof(ProductRepository));
 
             return services;
         }

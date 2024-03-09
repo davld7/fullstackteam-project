@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Ioon.Domain.Common.Interfaces.Base;
+using Ioon.Domain.Primitives;
+using Ioon.Domain.ValueObjects;
 
-namespace Ioon.Domain;
-
-public partial class Category
+namespace Ioon.Domain
 {
-    public int CategoryId { get; set; }
+    public partial class Category : AggregateRoot, IEntity
+    {
+        public Category(Guid businessId, Name categoryName)
+        {
+            BusinessId = businessId;
+            CategoryName = categoryName;
+        }
 
-    public int BusinessId { get; set; }
+        public Guid BusinessId { get; private set; }
 
-    public string CategoryName { get; set; } = null!;
-
-    public bool? IsActive { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-
-    public DateTime? ModifiedDate { get; set; }
-
-    public DateTime? DeletedDate { get; set; }
-
-    public virtual Business Business { get; set; } = null!;
-
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        public Name CategoryName { get; private set; }
+    }
 }

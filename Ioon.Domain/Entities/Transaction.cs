@@ -25,9 +25,4 @@ public partial class Transaction
 
     public virtual Business Business { get; set; } = null!;
 
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual PaymentType PaymentType { get; set; } = null!;
-
-    public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = new List<TransactionDetail>();
 }

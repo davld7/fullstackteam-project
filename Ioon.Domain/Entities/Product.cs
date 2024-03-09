@@ -1,26 +1,39 @@
-﻿namespace Ioon.Domain;
+﻿using Ioon.Domain.Common.Interfaces.Base;
+using Ioon.Domain.ValueObjects;
 
-public partial class Product
+namespace Ioon.Domain;
+
+public partial class Product : IEntity
 {
+    public Product(Guid productUuid, Guid businessUuid, Name productName, Money price, int stock, decimal? discount, Guid categoryId, string imgUrl, string description)
+    {
+        ProductUUID = productUuid;
+        BusinessUUID = businessUuid;
+        ProductName = productName;
+        Price = price;
+        Stock = stock;
+        Discount = discount;
+        CategoryUUID = categoryId;
+        ImgUrl = imgUrl;
+        Description = description;
+    }
 
-    public Guid ProductUuid { get; set; }
+    public Guid ProductUUID { get; private set; }
 
-    public int BusinessUuid { get; set; }
+    public Guid BusinessUUID { get; private set; }
 
-    public string ProductName { get; set; } = null!;
+    public Name ProductName { get; private set; }
 
-    public decimal Price { get; set; }
+    public Money Price { get; private set; }
 
-    public int Stock { get; set; }
+    public int Stock { get; private set; }
 
-    public decimal? Discount { get; set; }
+    public decimal? Discount { get; private set; }
 
-    public int CategoryUuid { get; set; }
+    public Guid CategoryUUID { get; private set; }
 
-    public string ImgUrl { get; set; } = null!;
+    public string ImgUrl { get; private set; }
 
-    public string Description { get; set; } = null!;
-
-    public bool? IsActive { get; set; }
+    public string Description { get; private set; }
 
 }

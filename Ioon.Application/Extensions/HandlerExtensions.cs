@@ -1,5 +1,4 @@
-﻿using Ioon.Application.Common.DTO;
-using Ioon.Domain.Common.Enums;
+﻿using Ioon.Domain.Common.Enums;
 using System.Net;
 
 namespace Ioon.Application.Extensions
@@ -32,6 +31,7 @@ namespace Ioon.Application.Extensions
                     AuthStatus.UserAuthorized => (HttpStatusCode.OK, "User authorized successfully."),
                     AuthStatus.EmailNotVerified => (HttpStatusCode.BadRequest, "Email verification required."),
                     AuthStatus.UserNotFound => (HttpStatusCode.Unauthorized, "Invalid username or password."),
+                    AuthStatus.InvalidPassword => (HttpStatusCode.BadRequest, "Invalid password."),
                     _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred during authentication.")
                 };
             }

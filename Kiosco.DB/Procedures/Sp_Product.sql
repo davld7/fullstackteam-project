@@ -5,45 +5,72 @@
     @Price DECIMAL(18,2),
     @Stock INT,
     @Discount DECIMAL(5,2),
-    @CategoryId INT,
+    @CategoryUUID UNIQUEIDENTIFIER,
     @ImgUrl NVARCHAR(MAX),
     @Description NVARCHAR(MAX),
 	@RowCount INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @BusinessId INT
+    DECLARE @BusinessId INT;
+    DECLARE @CategoryId INT;
 
-    SET @BusinessId = (
-    SELECT TOP 1 [BusinessId]
-    FROM [BusinessData].[Business]
-    WHERE [BusinessUUID] = @BusinessUUID)
+    BEGIN TRY
+        BEGIN TRANSACTION;
 
-    INSERT INTO [BusinessData].[Products] (
-        [ProductUUID],
-        [BusinessId],
-        [ProductName],
-        [Price],
-        [Stock],
-        [Discount],
-        [CategoryId],
-        [ImgUrl],
-        [Description]
-    )
-    VALUES (
-        @ProductUUID,
-        @BusinessId,
-        @ProductName,
-        @Price,
-        @Stock,
-        @Discount,
-        @CategoryId,
-        @ImgUrl,
-        @Description
-    )
+        SELECT TOP 1 @BusinessId = B.[BusinessId], @CategoryId = C.[CategoryId]
+        FROM [BusinessData].[Business] AS B
+        INNER JOIN [BusinessData].[Categories] AS C ON B.[BusinessId] = C.[BusinessId]
+        WHERE B.[BusinessUUID] = @BusinessUUID AND C.[CategoryUUID] = @CategoryUUID;
 
-    SET @RowCount = @@ROWCOUNT
-END
+        IF @BusinessId = 0
+        BEGIN         
+            ROLLBACK TRANSACTION;
+            DECLARE @msg1 NVARCHAR(2048) = FORMATMESSAGE(50002, N'Business');  
+            THROW 50002, @msg1, 1;
+        END
+
+        IF @CategoryId = 0
+		BEGIN
+			ROLLBACK TRANSACTION;
+			DECLARE @msg2 NVARCHAR(2048) = FORMATMESSAGE(50002, N'Category');
+			THROW 50002, @msg2, 1;
+		END
+
+        INSERT INTO [BusinessData].[Products] (
+            [ProductUUID],
+            [BusinessId],
+            [ProductName],
+            [Price],
+            [Stock],
+            [Discount],
+            [CategoryId],
+            [ImgUrl],
+            [Description]
+        )
+        VALUES (
+            @ProductUUID,
+            @BusinessId,
+            @ProductName,
+            @Price,
+            @Stock,
+            @Discount,
+            @CategoryId,
+            @ImgUrl,
+            @Description
+        );
+
+        SET @RowCount = @@ROWCOUNT;
+        
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+        DECLARE @msg3 NVARCHAR(2048) = FORMATMESSAGE(50004, N'Product');
+        THROW 50004, @msg3, 1;
+    END CATCH;
+END;
 
 GO
 
@@ -102,8 +129,8 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	SELECT
-		P.[ProductUUID] AS ID,
-		P.[ProductName],
+		P.[ProductUUID] AS Id,
+		P.[ProductName] AS Name,
 		P.[Price],
 		P.[Stock],
 		P.[Discount],

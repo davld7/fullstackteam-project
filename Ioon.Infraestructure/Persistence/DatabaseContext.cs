@@ -1,12 +1,11 @@
 ﻿using Ioon.Domain.Common.Interfaces.Base;
-using Ioon.Infrastructure.Context;
 using Microsoft.Extensions.Options;
 using System.Data;
 using System.Data.Common;
 
-namespace Ioon.Infrastructure.Data
+namespace Ioon.Infrastructure.Persistence
 {
-    public sealed class DatabaseContext : IDatabaseContext
+    public sealed class DatabaseContext : IDatabaseContext, IUnitOfWork
     {
         public DbConnection DatabaseConnection { get; }
 
@@ -86,5 +85,9 @@ namespace Ioon.Infrastructure.Data
             await DisposeTransactionAsync();
         }
 
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Ioon.Application.Common.DTO;
-
-namespace Ioon.Application.Common.Exceptions
+﻿namespace Ioon.Application.Common.Exceptions
 {
     [Serializable]
     public sealed class RepositoryException : Exception

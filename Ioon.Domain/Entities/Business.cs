@@ -1,19 +1,15 @@
-﻿using Ioon.Domain.Primitives.Entities;
+﻿using Ioon.Domain.Common.Interfaces.Base;
 using Ioon.Domain.ValueObjects;
 
 namespace Ioon.Domain;
 
-public partial class Business
+public partial class Business : IEntity
 {
 
-    public Business()
+    public Business(Guid businessId, Guid ownerId, Name businessName, EmailAddress email, PhoneNumber phone, string? address, string imgUrl, Ruc ruc, Guid departmentId, Guid businessTypeId)
     {
-
-    }
-    public Business(BusinessId businessId, Guid ownerId, BusinessName businessName, EmailAddress email, PhoneNumber phone, string? address, string imgUrl, Ruc ruc, Guid departmentId, Guid businessTypeId)
-    {
-        BusinessId = businessId;
-        OwnerId = ownerId;
+        BusinessUUID = businessId;
+        OwnerUUID = ownerId;
         BusinessName = businessName;
         Email = email;
         Phone = phone;
@@ -24,11 +20,11 @@ public partial class Business
         BusinessTypeId = businessTypeId;
     }
 
-    public BusinessId BusinessId { get; private set; }
+    public Guid BusinessUUID { get; private set; }
 
-    public Guid OwnerId { get; private set; }
+    public Guid OwnerUUID { get; private set; }
 
-    public BusinessName BusinessName { get; private set; }
+    public Name BusinessName { get; private set; }
 
     public EmailAddress Email { get; private set; }
 

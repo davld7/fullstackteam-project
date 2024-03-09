@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data.Common;
 
-namespace Ioon.Infrastructure.Context
+namespace Ioon.Infrastructure.Persistence
 {
     public class DatabaseOptions
     {

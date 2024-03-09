@@ -1,7 +1,8 @@
-﻿using System.Net;
+﻿using Ioon.Domain.Common.Interfaces.Base;
+using System.Net;
 using System.Text.Json.Serialization;
 
-namespace Ioon.Application.Common.DTO
+namespace Ioon.Application
 {
     [Serializable]
     public partial class ApplicationResponse : IDisposable
@@ -17,7 +18,7 @@ namespace Ioon.Application.Common.DTO
         public object? Data { get; set; }
 
         public void Dispose() { }
-       
+
 
     }
 }

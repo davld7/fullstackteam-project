@@ -19,7 +19,7 @@ namespace Ioon.Infrastructure.Persistence
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<OwnersBusiness> Owners { get; set; }
+        public DbSet<Owner> Owners { get; set; }
         public DbSet<Business> Businesses { get; set; }
  
 
@@ -30,7 +30,7 @@ namespace Ioon.Infrastructure.Persistence
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            var domainEvents = ChangeTracker.Entries<AgregateRoot>()
+            var domainEvents = ChangeTracker.Entries<AggregateRoot>()
                 .Select(x => x.Entity)
                 .Where(x => x.GetDomainEvents().Any())
                 .SelectMany(x => x.GetDomainEvents())

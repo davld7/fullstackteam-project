@@ -1,28 +1,20 @@
 ﻿using Ioon.Domain.Common.Interfaces.Services;
-using Microsoft.Extensions.Configuration;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
+using Microsoft.Extensions.Options;
 
-namespace Ioon.Application.Services
+namespace Ioon.Application.Services.Email
 {
     public class EmailService : IEmailService
     {
-        protected readonly IConfiguration _configuration;
-        protected readonly string Host;
-        protected readonly int Port;
-        protected readonly string User;
-        protected readonly string TokenVerification;
+        protected readonly EmailConfig _config;
         protected static readonly Random random = new Random((int)DateTime.Now.Ticks);
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IOptions<EmailConfig> configuration)
         {
-            _configuration = configuration;
-            Host = _configuration["Email:Host"] ?? throw new ArgumentNullException(nameof(Host));
-            Port = _configuration.GetValue<int>("Email:Port");
-            User = _configuration["Email:User"] ?? throw new ArgumentNullException(nameof(User));
-            TokenVerification = _configuration["Email:Token"] ?? throw new ArgumentNullException(nameof(TokenVerification));
+            _config = configuration.Value;
         }
 
         /// <summary>
@@ -31,7 +23,7 @@ namespace Ioon.Application.Services
         /// <param name="destination">Destinatario del correo electrónico.</param>
         public async Task SendEmailVerificationAsync(string destination)
         {
-            var message = MessageFactory(EmailType.Verify, destination, "Verifica tu cuenta de IOON");
+            var message = MessageFactory(EmailType.Verify, destination, $"Verifica tu cuenta de {_config.CompanyName}");
             await SendEmailAsync(message);
         }
 
@@ -42,8 +34,8 @@ namespace Ioon.Application.Services
         /// <returns>El código de verificación generado.</returns>
         public async Task<string> SendEmailCodeVerificationAsync(string destination)
         {
-            string verificationCode = random.Next(100000, 999999).ToString(); ;
-            var message = MessageFactory(EmailType.Verify, destination, "Codigo de verificación IOON", verificationCode);
+            string verificationCode = random.Next(100000, 999999).ToString();
+            var message = MessageFactory(EmailType.VerifyCode, destination, $"Codigo de verificación {_config.CompanyName} ", verificationCode);
             await SendEmailAsync(message);
             return verificationCode;
         }
@@ -54,7 +46,7 @@ namespace Ioon.Application.Services
         /// <param name="destination">Destinatario del correo electrónico.</param>
         public async Task SendPasswordResetAsync(string destination)
         {
-            var message = MessageFactory(EmailType.Reset, destination, "Restablece tu contraseña de IOON");
+            var message = MessageFactory(EmailType.Reset, destination, $"Restablece tu contraseña de {_config.CompanyName}");
             await SendEmailAsync(message);
         }
 
@@ -62,7 +54,7 @@ namespace Ioon.Application.Services
         {
             var bodyMessage = new MimeMessage();
 
-            bodyMessage.From.Add(new MailboxAddress("Ioon", User));
+            bodyMessage.From.Add(new MailboxAddress(_config.CompanyName, _config.User));
             bodyMessage.To.Add(MailboxAddress.Parse(destination));
             bodyMessage.Subject = subject;
             bodyMessage.Body = new TextPart(TextFormat.Html) { Text = GetHtmlBody(emailType, content ?? string.Empty) };
@@ -77,8 +69,8 @@ namespace Ioon.Application.Services
                 try
                 {
                     smtp.CheckCertificateRevocation = false;
-                    await smtp.ConnectAsync(Host, Port, SecureSocketOptions.Auto);
-                    await smtp.AuthenticateAsync(User, TokenVerification);
+                    await smtp.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.Auto);
+                    await smtp.AuthenticateAsync(_config.User, _config.Token);
                     await smtp.SendAsync(message);
                     await smtp.DisconnectAsync(true);
                 }
@@ -93,7 +85,7 @@ namespace Ioon.Application.Services
         {
             string template = emailType switch
             {
-                EmailType.Verify => Properties.Resources.verify_email_template,
+                EmailType.VerifyCode => Properties.Resources.verify_email_template,
                 EmailType.Reset => Properties.Resources.reset_password_template,
                 _ => throw new NotImplementedException(),
             };

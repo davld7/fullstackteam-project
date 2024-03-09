@@ -1,5 +1,4 @@
-﻿using Ioon.Application.Common.DTO;
-using MediatR;
+﻿using MediatR;
 
 namespace Ioon.Application.UsesCases.Accounts.Commands
 {

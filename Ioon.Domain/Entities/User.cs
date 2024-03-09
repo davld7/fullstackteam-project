@@ -1,16 +1,11 @@
-﻿using Ioon.Domain.Primitives;
-using Ioon.Domain.Primitives.Entities;
+﻿using Ioon.Domain.Common.Interfaces.Base;
 using Ioon.Domain.ValueObjects;
 
 namespace Ioon.Domain;
 
-public sealed class User : AgregateRoot
+public sealed class User : IEntity
 {
-    public User()
-    {
-    }
-
-    public User(UserId userId, string businessId, UserName userName, EmailAddress email, byte[] passwordHashed, byte[] passwordSalt, PhoneNumber phoneNumber, Identification identification, string roleId)
+    public User(Guid userId, Guid businessId, Name userName, EmailAddress email, byte[] passwordHashed, byte[] passwordSalt, PhoneNumber phoneNumber, Identification identification, Guid roleId)
     {
         UserId = userId;
         BusinessId = businessId;
@@ -23,11 +18,11 @@ public sealed class User : AgregateRoot
         RoleId = roleId;
     }
 
-    public UserId UserId { get; private set; }
+    public Guid UserId { get; private set; }
 
-    public string BusinessId { get; private set; }
+    public Guid BusinessId { get; private set; }
 
-    public UserName UserName { get; private set; }
+    public Name UserName { get; private set; }
 
     public EmailAddress Email { get; private set; }
 
@@ -39,6 +34,6 @@ public sealed class User : AgregateRoot
 
     public Identification Identification { get; private set; }
 
-    public string RoleId { get; private set; }
+    public Guid RoleId { get; private set; }
 
 }

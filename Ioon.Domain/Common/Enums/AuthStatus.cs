@@ -5,5 +5,6 @@
         UserAuthorized,
         EmailNotVerified,
         UserNotFound,
+        InvalidPassword
     }
 }

@@ -1,11 +1,9 @@
-﻿using Ioon.Application.Common.DTO;
-using static Ioon.Application.Extensions.HandlerExtensions;
+﻿using static Ioon.Application.Extensions.HandlerExtensions;
 using Ioon.Domain;
 using Ioon.Domain.Common.Enums;
 using Ioon.Domain.Common.Interfaces.Base;
 using Ioon.Domain.Common.Interfaces.Repositories;
 using Ioon.Domain.Common.Interfaces.Services;
-using Ioon.Domain.Primitives.Entities;
 using Ioon.Domain.ValueObjects;
 using MediatR;
 using Ioon.Application.UsesCases.Users.Commands;
@@ -29,7 +27,7 @@ namespace Ioon.Application.UsesCases.Users.Handlers
         {
             try
             {
-                if (UserName.Create(request.FullName) is not UserName userName)
+                if (Name.Create(request.FullName) is not Name userName)
                 {                  
                     return BuildResponse(EntityUserStatus.InvalidUserName);
                 }
@@ -66,19 +64,19 @@ namespace Ioon.Application.UsesCases.Users.Handlers
             }
         }
 
-        private User BuildUserEntity(CreateUserCommand request, UserName userName, EmailAddress emailAddress, PhoneNumber phoneNumber, Identification identification, byte[] Hash, byte[] Salt)
+        private User BuildUserEntity(CreateUserCommand request, Name userName, EmailAddress emailAddress, PhoneNumber phoneNumber, Identification identification, byte[] Hash, byte[] Salt)
         {
             return new User(
-                new UserId(Guid.NewGuid()),
-                request.BusinessId,
+                Guid.NewGuid(),
+                Guid.Parse(request.BusinessId),
                 userName,
                 emailAddress,
                 Hash,
                 Salt,
                 phoneNumber,
                 identification,
-                request.RoleId
-            );
+                Guid.Parse(request.RoleId)            
+           );
         }
 
     }

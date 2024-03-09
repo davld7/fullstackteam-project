@@ -61,6 +61,7 @@
     <Folder Include="Procedures" />
     <Folder Include="Constraints" />
     <Folder Include="Tables\Schema" />
+    <Folder Include="Errors" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Business.sql" />
@@ -84,6 +85,7 @@
     <Build Include="Procedures\Sp_Category.sql" />
     <Build Include="Procedures\Sp_Owners.sql" />
     <Build Include="Procedures\Sp_Generales.sql" />
+    <Build Include="Errors\Script1.sql" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
